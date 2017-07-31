@@ -1,0 +1,288 @@
+function Question(questionText, answerText, reason) {
+	this.questionText = questionText;
+	this.answerText = answerText;
+	this.reason = reason;
+	this.userAnswer = false;
+}
+
+function Quiz(questions, type, CCTriggers, MTriggers) {
+	this.questions = questions;
+	this.type = type;
+	this.CCTriggers = CCTriggers;
+	this.MTriggers = MTriggers;
+	this.testRecs = [false, false];
+	this.answered = [];
+}
+
+var questionOrder = [[0, 1, 2, 3, 4],
+					 [4, 3, 2, 0, 1],
+					 [4, 3, 2, 1, 0]];
+
+var triggers = 
+[
+	[ //Well triggers
+		[0b11, 0b101, 0b1001, 0b10001, 0b110, 0b1010], //CC
+		[0b10100, 0b11000] //M
+	],
+	[ //PWS-Large triggers
+		[0b111, 0b1011, 0b10110, 0b11100], //CC
+		[0b11, 0b110, 0b1001] //M
+	],
+	[ //PWS-Small triggers
+		[0b11, 0b10101, 0b1110, 0b11010, 0b10110, 0b11100], //CC
+		[0b101, 0b10001, 0b10010, 0b10100] //M
+	]
+ ]
+var resultText = {
+	open: ["Based on your responses we do not consider your drinking water high risk. You may still want to be proactive in testing your water for the most common heavy metals in US drinking water, which can show up in unexpected places.",
+		   "The following factors suggest an elevated risk of drinking water contamination in your home:",
+		   "The following factors suggest a high risk for potential contamination of the drinking water in your home:"],
+	close: ["",
+			"Because of this, we recommend the following Targeted Testing package to check for heavy metals from old pipes or other sources",
+			"Because of this, we recommend the following Complete Coverage package to discover what's in your water"]
+}
+
+var questions = [new Question("Have you performed a complete test of your water within the last 3 years and found nothing potentially hazardous?", ["NO", "YES"], "You haven't performed a complete test recently."),
+				 new Question("Do you live near any significant industrial or agricultural activity?", ["YES", "NO"], "You live near contaminant emitters (industry or agriculture)."),
+				 new Question("Have you recently noticed any odd smell, taste, or flavor coming from your water? Have you seen recent news about local drinking water incidents?", ["YES", "NO"], "You've noticed a recent change in your water's characteristics or heard about local water incidents."),
+				 new Question("Do infants or young children live in your home? Will they in the near future? Select yes if any other vulnerable individuals live in the home, such as the elderly or chronically ill.", ["YES", "NO"], "There are or will soon be vulnerable individuals in your home"),
+				 new Question("When was your home built?", ["Before 1986", "After 1986"], "Your home was built before lead pipes were completely outlawed.")];
+
+var tests = [
+	{name: 'Complete Coverage for Private and Shared Wells', link: 'https://mytapscore.com/products/simple-water-home-test', img: 'Tapscore-Well-Owner-Test_LQ.png', description: 'For the stuff that comes from the ground or that was put there later. Some carcinogens, like arsenic, have no taste or color.'}, 
+	{name: 'Complete Coverage for Water System Customers', link: 'https://mytapscore.com/products/the-public-water-supply-test', img: 'Tapscore-Utility-Customer-Test_LQ.png', description: 'For what utilities misses or intrudes during your water\'s 3+ day journey. Includes disinfection byproducts and other health threats.'},
+	{name: '"Top Hazards" Heavy Metals Test Lab Testing', link: 'https://mytapscore.com/products/heavy-metals-hardness-test', img: 'Tapscore-Heavy-Metals-Test_LQ.png', description: 'They come from old pipes, natural deposits, and industry. Common and dangerous. Includes lead & copper.'},
+	{name: 'Lead & Copper Professional Lab Testing', link: 'https://mytapscore.com/products/the-lead-test', img: 'Tapscore-Lead-Test_LQ.png', description: 'The most common metals in US drinking water. Lead is a neurotoxin that becomes dangerous at levels far below what test strips detect.'}
+	];
+
+var testMatch = [[[2, 3], [2], [0]],
+				[[2, 3], [2], [1]]];
+
+var types = ['Well', 'Water Utility'];
+
+var almostCounter = 0;
+
+function startQuiz(){
+	almostCounter = 0;
+	var start = $('<div>', { id: 'start' }); //make start div
+	$('#restart').remove();
+	start.append($('<h1>Don\'t know which one to get?<br>We can help you figure it out in 20 seconds!</h1>'));
+	start.append($('<button id="start-button">LET\'S GET STARTED</button>'));
+	$('#container').prepend(start).fadeIn();
+}
+
+function createQuiz(t){ //Orders quiz questions 
+	var orderedQuestions = [];
+	for (var i = 0; i < questionOrder[t].length; i++) {
+		orderedQuestions[i]=questions[questionOrder[t][i]];
+	}
+	quiz = new Quiz(orderedQuestions, t, triggers[t][0], triggers[t][1]); //sets global quiz to a new quiz
+}
+
+function createQuestion(){ //returns the next question
+	var currQ = quiz.questions.shift();
+	var question = $('<div>', { id: 'question'});
+	question.append($('<h2 id="question-text">' + currQ.questionText + '</h2>'));
+	question.append(createAnswers(currQ));
+	quiz.answered.push(currQ);
+	return question;
+}
+
+function createAnswers(q){
+	var row = $('<ul>', { id: 'answers'});
+	row.append($('<li>', { id: 'true', class: 'answer', text: q.answerText[0]}));
+	row.append($('<li>', { id: 'false', class: 'answer', text: q.answerText[1]}));
+	return row;
+}
+
+function displayAlmostDone(){ //displays an almost done page
+	$('#quiz').fadeOut(function(){
+		$('#question').remove();
+		$('#restart').remove();
+		var almost = $('<div id="almost">Great! Just a few more questions.</div>');
+		$('#quiz').append(almost);
+		$('#quiz').fadeIn();
+	})
+}
+
+function displayNext(){ //displays the almost done page, waits 1.0 seconds, then shows the next question
+	if(almostCounter % 2 == 1){
+		displayAlmostDone();
+	}
+	window.setTimeout(function(){
+		var q = createQuestion();
+		$('#quiz').fadeOut(function(){
+			$('#almost').remove();
+			$('#question').remove();
+			$('#restart').remove();
+			$('#quiz').append(q).append($('<p>', { id: 'restart', text: 'Start Over'}));
+			$('#quiz').fadeIn();
+			almostCounter++;
+		})
+	}, 1000 * (almostCounter % 2))
+}
+
+function recordAnswer(ans){
+	quiz.answered[quiz.answered.length - 1].userAnswer = ans;
+	var bitmask = ans ? 1 : 0;
+	for (var i = 0; i < quiz.CCTriggers.length; i++) {
+		var trigger = quiz.CCTriggers[i];
+		console.log(trigger + ' ' +  bitmask);
+		if ((trigger & 1) == (bitmask)){ //if it matches, shift over one
+			quiz.CCTriggers[i] = quiz.CCTriggers[i] >> 1;
+			if(quiz.CCTriggers[i] == 0){				   //if it's zero, mark as triggered
+				console.log(i);
+				quiz.testRecs[0] = true;
+				quiz.CCTriggers.splice(i, 1);
+				i--;
+			}
+		} else{							   //otherwise, delete it
+			console.log(i);
+			quiz.CCTriggers.splice(i, 1);
+			i--;
+		}
+	}
+	for (var i = 0; i < quiz.MTriggers.length; i++) {
+		var trigger = quiz.MTriggers[i];
+		if ((trigger & 1) == (bitmask)){ //if it matches, shift over one
+			quiz.MTriggers[i] = quiz.MTriggers[i] >> 1;
+			if(quiz.MTriggers[i] == 0){				   //if it's zero, mark as triggered
+				quiz.testRecs[1] = true;
+				quiz.MTriggers.splice(i, 1);
+				i--;
+			}
+		} else{							   //otherwise, delete it
+			quiz.MTriggers.splice(i, 1);
+			i--;
+		}
+	}
+	console.log(quiz);
+}
+
+function createResults(){
+	//calculate risk
+	quiz.risk = 0;
+	if(quiz.testRecs[1]){
+		quiz.risk = 1;
+	} else if(quiz.testRecs[0]){
+		quiz.risk = 2;
+	}
+
+	var totalResults = $('<div>', { id: 'results'});
+	totalResults.append($('<p>', { id: 'open', text: resultText.open[quiz.risk]}));
+	totalResults.append(createReasonList());
+	if(quiz.risk > 0){
+		totalResults.append($('<p>', { id: 'close', text: resultText.close[quiz.risk] + ':'}));
+	}
+	return totalResults;
+}
+
+function displayResults(){
+	var q = $('#quiz');
+	q.fadeOut(function(){
+		$('#question').remove();
+		var results = createResults();
+		if(type >= 1) {type = 1;}
+		var testNums = testMatch[type][quiz.risk];
+		console.log(testNums);
+		for (var i = testNums.length - 1; i >= 0; i--) {
+			q.prepend(createTest(tests[testNums[i]]));
+		}
+		q.prepend(results);
+		q.fadeIn();
+	});
+}
+
+function createReasonList(){
+	if(quiz.risk > 0){
+		var reasons = $('<ul>', { id: 'reasons'});
+		for (var i = 0; i < quiz.answered.length; i++) {
+			if(quiz.answered[i].userAnswer) {
+				var reason = $('<li>', { class: 'reason', text: '- ' + quiz.answered[i].reason});
+				reasons.append(reason);
+			}
+		}
+	}
+	return reasons;
+}
+
+function createTest(testObj){
+	console.log(testObj);
+	var test = $('<div>', { class: 'test'});
+	var img = $('<img>', { class: 'test-pic', src: 'img/' + testObj.img, alt: 'Water Test Package'});
+	var title = $('<a>', { class: 'test-title', href: testObj.link, text: testObj.name});
+	var description = $('<p>', { class: 'test-description', text: testObj.description});
+	var text = $('<div>', { class: 'test-container'});
+	text.append(title).append(description);
+	test.append(img).append(text);
+	return test;
+}
+
+$(document).on('click', '#start-button', function(e){ // start test, ask for water source
+	e.preventDefault();
+	var askType = $('<div>', { id: 'question'});
+	askType.append($('<h2>First, tell us where the water you want to test comes from.</	h2>'));
+	var choices = $('<ul>', { id: 'answers'});
+	choices.append($('<li>', {id: 'well', class: 'answer', text: 'I own or share a groundwater well'}));
+	choices.append($('<li>', {id: 'pwsl', class: 'answer', text: 'I pay a water utility in a large city'}));
+	choices.append($('<li>', {id: 'pwss', class: 'answer', text: 'I pay a water utility in a small town'}));
+	askType.append(choices);
+	$('#container > *').fadeOut(function(){
+			$('#container').prepend($('<div>', { id: 'quiz'}));
+			$('#quiz').append(askType);
+			$('#start').remove();
+			$('#quiz').fadeIn();
+	});
+});
+
+$(document).on('click', '#well', function(e){ //well
+	e.preventDefault();
+	type = 0;
+	createQuiz(type);
+	displayNext();
+});
+
+$(document).on('click', '#pwsl', function(e){ //pswl
+	e.preventDefault();
+	type = 1;
+	createQuiz(type);
+	displayNext();
+});
+
+$(document).on('click', '#pwss', function(e){ //pwss
+	e.preventDefault();
+	type = 2;
+	createQuiz(type);
+	displayNext();
+});
+
+$(document).on('click', '#true', function(e){ //pwss
+	e.preventDefault();
+	recordAnswer(true);
+	if(quiz.questions.length == 0){
+		displayResults();
+	} else {
+		displayNext();
+	}
+});
+
+$(document).on('click', '#false', function(e){ //pwss
+	e.preventDefault();
+	recordAnswer(false);
+	if(quiz.questions.length == 0){
+		displayResults();
+	} else {
+		displayNext();
+	}
+});
+
+$(document).on('click', '#restart', function(e){ //pwss
+	e.preventDefault();
+	quiz = null;
+	$('#quiz').fadeOut(function(){
+		$('#quiz').remove();
+		startQuiz();
+	});
+});
+
+startQuiz();
