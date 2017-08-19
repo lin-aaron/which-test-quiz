@@ -1,179 +1,193 @@
-.which-test-text {
-	font-family: 'Roboto', sans-serif;
-	color: white;
+#which-test-container h1 { 
+  color: white !important; 
+  font-size: rem(27px) !important;
+  @include breakpoint(s) { font-size: rem(22px) !important; }
 }
 
-#which-test-container{
-	background: #24BEDF;
-	padding: 12px;
-	min-height: 175px;
-	overflow: auto;
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+#which-test-container h2 { 
+  color: white !important; 
+  margin-bottom: 0; 
+  font-size: rem(26px) !important;
+  @include breakpoint(s) { font-size: rem(18px) !important; }
 }
 
-#which-test-container div{
-	border-radius: 12px;
-	color: white;
-	text-align:center;
-}
+#which-test-container { 
+  position: relative;
+  background: #24BEDF;
+  border-radius: 12px;
+  padding: 14px;
+  min-height: 185px;
+  overflow: hidden;
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  -webkit-align-items: center;
+  justify-content: center;
+  -webkit-justify-content: center;
+  margin-top: $gutter-vertical-medium;	
+  margin-bottom: $gutter-vertical-medium;
+  text-align: center;
+  @include breakpoint(s) { 
+    //display: none;
+    padding: 10px; 
+    padding-bottom: 21px; 
+  }
 
-#which-test-start-button{
-	background: #F3982C;
-	color: white;
-	font-family: 'Roboto', sans-serif;
-	font-weight: bold;
-	font-size: 16px;
-	border-radius: 12px;
-	border: 0px;
-	padding: 12px;
-
-}
-
-.which-test-title, #which-test-container h2, .which-test-ul{
-	margin: 0px;
-	align-content: center;
-	padding: 12px;
-}
-
-ul#which-test-answers{
-	display:flex;
-	justify-content: space-around;
-	width:60%;
-}
-
-#which-test-question{
-	display:flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-li.which-test-answer{
-	display: inline-block;
-	color: #F3982C;
-	padding: 5px;
-	border: 3px solid #F3982C;
-	border-radius: 12px;
-	background: white;
-	width: 150px;
-	font-weight: bold;
-	font-size: 20px;
-}
-
-li.which-test-reason, #answers{
-	list-style-type: none;
-}
-
-#which-test-results {
-	text-align: left;
-	padding-top: 12px;
-}
-
-#which-test-restart {
-	color: #53828D;
-	font-size: 20px;
-	font-weight: bold;
-	align-self: flex-end;
-	margin: 0px;
-}
-
-#which-test-almost{
-	font-size: 48px;
-	font-weight: bold;
+  #which-test-start-button {
+    color: white;
+    background: #F3982C;
+    font-weight: 700;
+    font-size: rem(19px);
+    border-radius: 10px;
+    border: 0px;
+    padding: 15px;
+    margin-bottom: $gutter-vertical-small;
+  }
 }
 
 #which-test-quiz{
-	display: flex;
-	flex-direction: column;
-	height: auto;
-	width: 80%;
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  height: auto;
+  width: 90%;
 }
 
-.which-test-progBar{
-	border-radius: 4px;
-	height: 5px;
+#which-test-answers {
+ display: -webkit-flex;
+ display: flex;
+ -webkit-flex-direction: row;
+ flex-direction: row;
+ -webkit-align-items: center;
+ align-items: center;
+ -webkit-justify-content: center;
+ justify-content: center;
+  width: 90%;
+  @include breakpoint(s) { 
+    width: 100%;
+    flex-direction: column; 
+    -webkit-flex-direction: column; 
+  }  
 }
 
-.which-test-progBar-bkgd{
-	width: 80%;
-	background: white;
-	margin: 12px 0px 12px 0px;
-	align-self: center;
+#which-test-question {
+ display: -webkit-flex;
+ display: flex;
+ -webkit-flex-direction: column;
+ flex-direction: column;
+ -webkit-align-items: center;
+ align-items: center;
+ -webkit-justify-content: center;
+ justify-content: center;
+  #question-text { 
+    margin-left: 15px; 
+    margin-right: 15px;
+  }
 }
 
-.which-test-progBar-fill{
-	background: #F3982C;
+.which-test-answer {
+  cursor: pointer;
+  color: #F3982C;
+  padding: 9px;
+  border: 3px solid #F3982C;
+  border-radius: 12px;
+  background-color: white;
+  font-weight: 700;
+  font-size: rem(20px);
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 150px;
+  
+  @include breakpoint(s) { 
+    font-size: rem(17px);
+    border-width: 2px;
+    margin: ($gutter-vertical-small / 2) auto;
+  }
+}
+
+#which-test-restart {
+  cursor: pointer;
+  position: absolute;
+  bottom: 4px;
+  right: 25px;
+  color: #53828D;
+  font-size: rem(22px);
+  font-weight: 700;
+  margin: 0;
+  @include breakpoint(s){
+    font-size: rem(21px);
+    right: 20px;
+    bottom: 3px;
+  }
+}
+
+#which-test-almost {
+  font-size: rem(40px);
+  font-weight: 700;
+  color: white !important;
+  @include breakpoint(s) { 
+    font-size: rem(34px); 
+  }
+}
+
+#which-test-results {
+  text-align: left;
 }
 
 #which-test-open, #which-test-close{
-	font-size: 20px;
-	font-weight: bold;
-	margin: 0px 0px 6px 12px;
+  font-size: rem(20px);
+  color: white !important;
+  font-weight: 700;
+  margin-bottom: $gutter-vertical-small;
 }
 
 #which-test-reasons{
-	margin-left: 12px;
-	text-align: left;
+  font-size: rem(17px);
+  font-weight: 700;
+  margin-left: 12px;
+  text-align: left;
+  color: white !important;
+  line-height: rem(16px);
 }
 
-.test{
-	display: flex;
-	background: white;
-	max-width: 500px;
-	justify-content: space-around;
-	align-items: center;
-	align-self: center;
-	border: 2px solid white;
-	margin: 5px;
-	text-decoration: none;
-	border-radius: 12px;
+.test {  
+  text-align: left;
+  display: flex;
+  background: white;
+  max-width: 500px;
+  justify-content: space-around;
+  align-items: center;
+  align-self: center;
+  border: 2px solid white;
+  border-radius: 10px;
+  margin: 5px;
+  margin-bottom: 15px;
 }
 
-.test-container{
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	align-items: center;
+.test-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
 
-.test-title{
-	color: #F3982C;
-	font-size: 20px;
-	font-weight: bold;
-	margin: 6px;
+.test-title {
+  color: #F3982C !important;
+  text-decoration: underline;
+  font-size: rem(20px);
+  font-weight: 700;
+  margin: 6px;
 }
 
-.test-description{
-	color: black;
-	margin: 6px;
+.test-description {
+  color: $color-body;
+  margin: 6px;
 }
 
-.test-pic{
-	height: 100px;
-	border-radius: 12px;
-	padding: 12px;
-}
-
-@media all and (max-width: 600px){
-	.which-test-results, .which-test-answers{
-		display:flex;
-		align-items: center;
-		flex-direction: column;		
-	}
-
-	li.which-test-answer{
-		margin-top: 6px;
-		margin-bottom: 6px;
-	}
-
-	.which-test-title {
-		font-size: 24px;
-	}
-
-	#which-test-almost {
-		font-size: 36px;
-	}
+.test-pic {
+  height: 120px;
+  width: 120px;
+  border-radius: 10px;
+  padding: 13px;
 }
